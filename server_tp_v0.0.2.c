@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
+//Constantes
 #define PUERTO 8080
 
 void *atenderCliente(void *params);
