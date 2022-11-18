@@ -93,7 +93,7 @@ void *atenderCliente(void *params)
     char request[8192];
     int bytesRecibidos = 0;
     char headerImage[2048];
-    char imageBody[2048];
+    char imageBody[127];
 
     int fimage = NULL;
 
@@ -151,7 +151,15 @@ image/jpeg
         //sprintf(imageBody,"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567");
         //strcpy(imageBody,(char*)fimage);
         send(*descriptorHilo, headerImage, 102, 0);
-        //send(*descriptorHilo, imageBody, 127, 0);
+
+        while(fgets(imageBody, sizeof(imageBody), fimage) != NULL) {
+            if (send(*descriptorHilo, imageBody, sizeof(imageBody), 0) == -1) {
+            perror("[-]Error in sending file.");
+            exit(1);
+            }
+        bzero(imageBody, 127);
+        }
+
 
         sendfile(*descriptorHilo,fimage,NULL,127);
         printf("Enviando imagen\n");
