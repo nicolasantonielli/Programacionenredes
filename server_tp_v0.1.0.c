@@ -17,7 +17,7 @@
 #include <fcntl.h>
 
 // Constantes
-#define PUERTO 8002
+#define PUERTO 8003
 
 //
 void *atenderCliente(void *params);
@@ -167,7 +167,7 @@ void *atenderCliente(void *params)
         // body
         bzero(sendBuff, sizeof(sendBuff));
         bzero(body, sizeof(body));
-        sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), PUERTO,*descriptorHilo);
+        sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), *descriptorHilo);
 
         // Calculo el length del Body para enviar el content length
         lengthBody = strlen(body);
