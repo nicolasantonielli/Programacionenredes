@@ -17,7 +17,7 @@
 #include <fcntl.h>
 
 // Constantes
-#define PUERTO 8088
+#define PUERTO 8005
 
 //
 void *atenderCliente(void *params);
@@ -140,8 +140,6 @@ void *atenderCliente(void *params)
 
     printf("\n****Request recibido****\n");
     printf("%s\n", request);
-
-    // printf("\n\nCabezera request: %s\n", request[1]);
 
     // Envio imagen
 

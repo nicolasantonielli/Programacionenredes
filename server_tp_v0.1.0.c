@@ -17,7 +17,7 @@
 #include <fcntl.h>
 
 // Constantes
-#define PUERTO 8091
+#define PUERTO 8001
 
 //
 void *atenderCliente(void *params);
