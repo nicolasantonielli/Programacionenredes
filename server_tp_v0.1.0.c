@@ -50,6 +50,8 @@ int main(int argc, char *argv[])
 
     // Definicion de modo escucha y seteo la cola en 10
     listen(listenfd, 10);
+    
+    
 
     printf("Escuchando en puerto %d...\n", PUERTO);
 
@@ -165,7 +167,7 @@ void *atenderCliente(void *params)
         // body
         bzero(sendBuff, sizeof(sendBuff));
         bzero(body, sizeof(body));
-        sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"http://192.168.199.101:%d/image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), PUERTO,*descriptorHilo);
+        sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"http://127.0.0.1:%d/image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), PUERTO,*descriptorHilo);
 
         // Calculo el length del Body para enviar el content length
         lengthBody = strlen(body);
