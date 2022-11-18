@@ -90,7 +90,7 @@ void *atenderCliente(void *params)
     int *descriptorHilo = 0;
     char body[2048];
     descriptorHilo = (int *)params;
-    int length = 0;
+    int lengthBody = 0;
     char request[1024];
     int bytesRecibidos = 0;
 
@@ -106,10 +106,16 @@ void *atenderCliente(void *params)
     memset(request, '0', sizeof(request));
     memset(body, '0', sizeof(body));
 
+    bzero(recvBuff, sizeof(recvBuff));
+    bzero(request, sizeof(request));
     // recibo request
     do
     {
         estadoRecibir = recv(*descriptorHilo, recvBuff, sizeof(recvBuff), 0);
+        
+        //Concateno buffer recibido
+        strcat(request,recvBuff);
+        
         if (estadoRecibir == 0)
         {
             printf("Conexión cerrada por el cliente.\n");
@@ -123,32 +129,42 @@ void *atenderCliente(void *params)
         if (estadoRecibir != 0)
         {
             printf("Recibiendo datos\n");
-            printf("Bytes recibidos %d\n", estadoRecibir);
+            printf("Bytes recibidos: %d bytes\n", estadoRecibir);
             bytesRecibidos += estadoRecibir;
         }
-
-        printf("Bytes recibidos: %d bytes\n", bytesRecibidos);
-        printf("%s", request);
-
-        // Armo response
-
-        // length body
-        length = 360;
-        // body
-        bzero(sendBuff,sizeof(sendBuff));
-        sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"http://192.168.199.101:8080/image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), *descriptorHilo);
-        // headers
-        sprintf(sendBuff, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nAccept-Ranges: bytes\r\nServer: NicoServer_2.0\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: %d\r\n\r\n", length);
-        strcat(sendBuff, body);
-
-        printf("%s", sendBuff);
-        printf("\nDescriptor del hilo %d\n", *descriptorHilo);
-        send(*descriptorHilo, sendBuff, sizeof(sendBuff), 0);
-
-        // text/html
-        // image/png
-        // image/jpeg
     } while (1);
+
+    printf("Bytes totales recibidos: %d bytes\n", bytesRecibidos);
+
+    printf("\n****Request recibido****\n");
+    printf("%s\n", request);
+
+    // Armo response
+
+    // length body
+
+    // body
+    bzero(sendBuff, sizeof(sendBuff));
+    bzero(body, sizeof(body));
+    sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"http://192.168.199.101:8080/image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), *descriptorHilo);
+
+    // Calculo el length del Body
+    lengthBody = strlen(body);
+
+    // headers
+    sprintf(sendBuff, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nAccept-Ranges: bytes\r\nServer: NicoServer_2.0\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: %d\r\n\r\n", lengthBody);
+
+    strcat(sendBuff, body);
+
+    printf("\n****Response enviado****\n");
+
+    printf("%s\n", sendBuff);
+    printf("\nDescriptor del hilo %d\n", *descriptorHilo);
+    send(*descriptorHilo, sendBuff, sizeof(sendBuff), 0);
+
+    // text/html
+    // image/png
+    // image/jpeg
 
     /*
             sprintf(headerImage, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: 127\r\n\r\n");
