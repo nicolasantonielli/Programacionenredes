@@ -100,7 +100,7 @@ void *atenderCliente(void *params)
     char imageHeader[2048];
     char imageBody[127];
 
-    FILE *fimage = NULL;
+    int *fimage = NULL;
 
     memset(sendBuff, '0', sizeof(sendBuff));
     memset(recvBuff, '0', sizeof(recvBuff));
@@ -144,7 +144,7 @@ void *atenderCliente(void *params)
 
     //printf("\n\nCabezera request: %s\n", request[1]);
 
-
+/*
     // Armo response del index.html
 
     // body
@@ -166,18 +166,18 @@ void *atenderCliente(void *params)
     printf("\nDescriptor del hilo %d\n", *descriptorHilo);
     send(*descriptorHilo, sendBuff, lengthSend, 0);
 
-
+*/
     // Envio imagen
 
     fimage = fopen("/home/nico/Documentos/2x2.png", "r");
 
-    /*
-    sprintf(headerImage, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: 127\r\n\r\n");
+    printf("%d",fimage);
+
+    sprintf(imageHeader, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: 127\r\n\r\n");
     sendfile(*descriptorHilo,fimage,NULL,127);
     printf("Enviando imagen\n");
     fclose(fimage);
         
-    */
 
     // Cierro Socket
 
