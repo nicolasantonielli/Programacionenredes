@@ -13,8 +13,11 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
+#include <sys/stat.h>
+#include <fcntl.h>
+
 // Constantes
-#define PUERTO 8080
+#define PUERTO 8081
 
 //
 void *atenderCliente(void *params);
@@ -100,7 +103,7 @@ void *atenderCliente(void *params)
     char imageHeader[2048];
     char imageBody[127];
 
-    int *fimage = NULL;
+    int fimage = 0;
 
     memset(sendBuff, '0', sizeof(sendBuff));
     memset(recvBuff, '0', sizeof(recvBuff));
@@ -113,10 +116,10 @@ void *atenderCliente(void *params)
     do
     {
         estadoRecibir = recv(*descriptorHilo, recvBuff, sizeof(recvBuff), 0);
-        
-        //Concateno buffer recibido
-        strcat(request,recvBuff);
-        
+
+        // Concateno buffer recibido
+        strcat(request, recvBuff);
+
         if (estadoRecibir == 0)
         {
             printf("Conexión cerrada por el cliente.\n");
@@ -142,42 +145,49 @@ void *atenderCliente(void *params)
     printf("\n****Request recibido****\n");
     printf("%s\n", request);
 
-    //printf("\n\nCabezera request: %s\n", request[1]);
+    // printf("\n\nCabezera request: %s\n", request[1]);
 
-/*
-    // Armo response del index.html
+    /*
+        // Armo response del index.html
 
-    // body
-    bzero(sendBuff, sizeof(sendBuff));
-    bzero(body, sizeof(body));
-    sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"http://192.168.199.101:8080/image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), *descriptorHilo);
+        // body
+        bzero(sendBuff, sizeof(sendBuff));
+        bzero(body, sizeof(body));
+        sprintf(body, "<!DOCTYPE html\">\r\n<html>\r\n<head>\r\n<title>Servidor_Programacion en redes 2022</title>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\r\n</head>\r\n<body>\r\n<h2>Servidor TP Programacion en redes 2022</h2>\r\n<p>PID: %d</p><a href=\"http://192.168.199.101:8080/image.png\">image.png</a>\r\n<p>Descriptor numero: %d</p>\r\n</body>\r\n</html>", getpid(), *descriptorHilo);
 
-    // Calculo el length del Body para enviar el content length
-    lengthBody = strlen(body);
+        // Calculo el length del Body para enviar el content length
+        lengthBody = strlen(body);
 
-    // headers
-    sprintf(sendBuff, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nAccept-Ranges: bytes\r\nServer: NicoServer_2.0\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: %d\r\n\r\n", lengthBody);
-    
-    // Calculo el length total a enviar
+        // headers
+        sprintf(sendBuff, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nAccept-Ranges: bytes\r\nServer: NicoServer_2.0\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: %d\r\n\r\n", lengthBody);
 
-    printf("\n****Response enviado****\n");
-    printf("%s\n", sendBuff);
-    lengthSend = strlen(sendBuff);
-    printf("\nDescriptor del hilo %d\n", *descriptorHilo);
-    send(*descriptorHilo, sendBuff, lengthSend, 0);
+        // Calculo el length total a enviar
 
-*/
+        printf("\n****Response enviado****\n");
+        printf("%s\n", sendBuff);
+        lengthSend = strlen(sendBuff);
+        printf("\nDescriptor del hilo %d\n", *descriptorHilo);
+        send(*descriptorHilo, sendBuff, lengthSend, 0);
+
+    */
     // Envio imagen
 
-    fimage = fopen("/home/nico/Documentos/2x2.png", "r");
+    fimage = open("/home/nico/Documentos/2x2.png", O_RDONLY);
 
-    printf("%d",fimage);
+    printf("\nDesciptor de la imagen %d\n", fimage);
 
-    sprintf(imageHeader, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: 127\r\n\r\n");
-    sendfile(*descriptorHilo,fimage,NULL,127);
+    bzero(imageHeader, sizeof(imageHeader));
+    
+    sprintf(imageHeader, "HTTP/1.1 200 OK\r\nContent-Type: image/png\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: 127\r\n\r\n");
+    lengthSend = strlen(imageHeader);
+    send(*descriptorHilo, imageHeader, lengthSend, 0);
+
+    if (sendfile(*descriptorHilo, fimage, NULL, 127) != 0)
+    {
+        printf("Hubo un error enviando el archivo por el socket\n");
+    }
     printf("Enviando imagen\n");
-    fclose(fimage);
-        
+    close(fimage);
 
     // Cierro Socket
 
