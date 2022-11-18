@@ -17,7 +17,7 @@
 #include <fcntl.h>
 
 // Constantes
-#define PUERTO 8081
+#define PUERTO 8084
 
 //
 void *atenderCliente(void *params);
@@ -172,7 +172,9 @@ void *atenderCliente(void *params)
     */
     // Envio imagen
 
-    fimage = open("/home/nico/Documentos/2x2.png", O_RDONLY);
+    if ((fimage = open("/home/nico/Documentos/2x2.png", O_RDONLY))==-1){
+        printf("Error no se pudo abrir el archivo\n");
+    }
 
     printf("\nDesciptor de la imagen %d\n", fimage);
 
@@ -181,11 +183,14 @@ void *atenderCliente(void *params)
     sprintf(imageHeader, "HTTP/1.1 200 OK\r\nContent-Type: image/png\r\nDate: Sun, 13 Nov 2022 02:49:07 GMT\r\nContent-Length: 127\r\n\r\n");
     lengthSend = strlen(imageHeader);
     send(*descriptorHilo, imageHeader, lengthSend, 0);
-
-    if (sendfile(*descriptorHilo, fimage, NULL, 127) != 0)
+/*
+    if ((sendfile(*descriptorHilo, fimage, NULL, 127)) != 0)
     {
         printf("Hubo un error enviando el archivo por el socket\n");
     }
+*/
+    printf("que devuelve sendfile %d",sendfile(*descriptorHilo, fimage, NULL, 127));
+
     printf("Enviando imagen\n");
     close(fimage);
 
